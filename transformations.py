@@ -211,26 +211,24 @@ def calculate_total_grade():
         a.writerows(final_lines)
 
 def calculate_final_percentile():
-    csv_file = open('final.csv')
-    headers_list = csv_file.next().strip().split(',')
-    headers_list.append('percentile')
-    lines = [headers_list]
-    final_lines = [headers_list]
+    with open('combined.csv') as fo:
+        headers_list = fo.readline().strip().split(',')
+        headers_list.append('percentile')
+        lines = [headers_list]
+        final_lines = [headers_list]
 
-    scores = []
-    for line in csv_file:
-        splits = line.split(',')
-        splits = [f.strip() for f in splits]
-        scores.append(numeric_or_zero(splits[14]))
-        lines.append(splits)
-        
+        scores = []
+        for line in fo:
+            splits = line.split(',')
+            splits = [f.strip() for f in splits]
+            scores.append(numeric_or_zero(splits[-1]))
+            lines.append(splits)
+            
     for splits in lines[1:]:
-        score_percentile = get_percentile(scores, numeric_or_zero(splits[14]))
+        score_percentile = get_percentile(scores, numeric_or_zero(splits[-1]))
         splits.append(score_percentile)
         final_lines.append(splits)
 
-
-    csv_file.close()
 
     with open('ggg.csv', 'w') as fp:
         a = csv.writer(fp, delimiter=',')

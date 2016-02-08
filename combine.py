@@ -53,7 +53,7 @@ def write_combined_csv(data, file_name='combined.csv'):
     for email, inner_dict in data.items():
         inner_dict['email'] = email
         list_data.append(inner_dict)
-    with open(file_name, 'wb') as combined_file:
+    with open(file_name, 'w+') as combined_file:
         dict_writer = csv.DictWriter(combined_file, headers)
         dict_writer.writeheader()
         dict_writer.writerows(list_data)
@@ -71,5 +71,15 @@ def get_intersection_keys(files, key_header):
             keys = keys & set(file_keys) if keys else set(file_keys)
 
     return keys
+
+
+def main():
+    files = ['paidstudents.csv', 'forum.csv']
+    key_header = 'email'
+    keys = get_intersection_keys(files, key_header)
+    files = ['forum.csv', 'questions.csv', 'assignments.csv']
+    data = read_multiple_csv(files, key_header, acceptable_keys=keys)
+    write_combined_csv(data)
+
 
 
