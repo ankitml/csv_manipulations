@@ -73,20 +73,18 @@ def get_percentile(data_list, score, kind='weak'):
         raise ValueError("The kind kwarg must be 'strict', 'weak' or 'mean'. You can also opt to leave it out and rely on the default method.")
 
 def calculate_assignments_attempted():
-    csv_file = open('assignments.csv')
-    headers_list = csv_file.next().strip().split(',')
-    headers_list.append('assignments_submitted')
-    lines = [headers_list]
+    with open('assignments.csv', 'r+') as fo:
+        headers_list = fo.readline().strip().split(',')
+        headers_list.append('assignments_submitted')
+        lines = [headers_list]
 
-    for line in csv_file:
-        splits = line.split(',')
-        splits = [f.strip() for f in splits]
-        zeroes = len([f for f in splits if f in ['', '0']])
-        assignments_submitted = 2 - zeroes
-        splits.append(str(assignments_submitted))
-        lines.append(splits)
-
-    csv_file.close()
+        for line in fo:
+            splits = line.split(',')
+            splits = [f.strip() for f in splits]
+            zeroes = len([f for f in splits if f in ['', '0']])
+            assignments_submitted = 8 - zeroes
+            splits.append(str(assignments_submitted))
+            lines.append(splits)
 
     with open('aaa.csv', 'w') as fp:
         a = csv.writer(fp, delimiter=',')
@@ -152,38 +150,36 @@ def calculate_questions_grade():
 
 def calculate_assignment_grade():
     import numpy as np
-    csv_file = open('aaa.csv')
-    headers_list = csv_file.next().strip().split(',')
-    headers_list.append('assignment_grade')
-    data_lines  = []
-    scores = []
+    with open('aaa.csv') as fo:
+        headers_list = fo.readline().strip().split(',')
+        headers_list.append('assignment_grade')
+        data_lines  = []
+        scores = []
 
-    for line in csv_file:
-        splits = [f.strip() for f in line.split(',')]
-        splits = [int(s) if get_type(s) is int else s for s in splits]
-        if splits[3] == '':
-            splits[3] = 0
-        if splits[4] == '':
-            splits[4] = 0
-        try:
-            scores.append(splits[3] + splits[4])
-        except TypeError:
-            import ipdb; ipdb.set_trace() 
-        data_lines.append(splits)
+        for line in fo:
+            splits = [f.strip() for f in line.split(',')]
+            splits = [0 if s == "" else s for s in splits]
+            splits = [get_type(s)(s) if get_type(s) in (int, float) else s for s in splits]
+            scores.append(sum(splits[2:]))
+            data_lines.append(splits)
 
 
-    non_zero_scores = [s for s in scores if s > 0]
-    std_dev = np.std(non_zero_scores)
-    grades = [s*1.0/std_dev for s in scores]
-    max_grade = max(grades)
-    grades = [g*10/max_grade for g in grades]
-
-    graded_lines = [headers_list]
-    for key,split_line  in enumerate(data_lines):
-        split_line.append(round(grades[key], 2))
-        graded_lines.append(split_line)
-
-    csv_file.close()
+        import pdb
+        pdb.set_trace()
+        non_zero_scores = [s for s in scores if s > 0]
+        std_dev = np.std(non_zero_scores)
+        grades = [s*1.0/std_dev for s in scores]
+        max_grade = max(grades)
+        grades = [g*10/max_grade for g in grades]
+        averaging_factor = 7 / np.mean(grades) # converts the average to 7
+        graded_lines = [headers_list]
+        for key,split_line  in enumerate(data_lines):
+            try:
+                split_line.append(round(grades[key], 2))
+            except:
+                import pdb
+                pdb.set_trace()
+            graded_lines.append(split_line)
 
     with open('aaa2.csv', 'w') as fp:
         a = csv.writer(fp, delimiter=',')

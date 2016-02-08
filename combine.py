@@ -17,8 +17,6 @@ def read_multiple_csv(files, key_header, acceptable_keys=None):
     # if not given all will be accepted, this list can come out of 
     # intersection or other set methods
     header_line = []
-    import pdb
-    pdb.set_trace()
 
     for filename in files:
         with open(filename, 'r+') as fo:
@@ -45,6 +43,8 @@ def read_multiple_csv(files, key_header, acceptable_keys=None):
     return data
             
 def write_combined_csv(data, file_name='combined.csv'):
+    import pdb
+    pdb.set_trace()
     import csv
     #headers = ['email']
     headers = data.pop('headers')
@@ -57,7 +57,6 @@ def write_combined_csv(data, file_name='combined.csv'):
         dict_writer = csv.DictWriter(combined_file, headers)
         dict_writer.writeheader()
         dict_writer.writerows(list_data)
-
 
 def get_intersection_keys(files, key_header):
     keys = None
