@@ -1,6 +1,6 @@
 from true_type import get_type
 
-def read_multiple_csv(files, key_header):
+def read_multiple_csv(files, key_header, rows=None):
     """
     takes a list of filesnames and a key_header string to merge the files. 
     Can merge if there are different columns in the files, different records in
@@ -14,8 +14,6 @@ def read_multiple_csv(files, key_header):
     # files = ['assignments.csv', 'discuss.csv', 'questions.csv']
     # key_header = 'email'
     header_line = []
-    import pdb
-    pdb.set_trace()
 
     for filename in files:
         file_generator = open(filename)
@@ -56,3 +54,20 @@ def write_combined_csv(data, file_name='combined.csv'):
         dict_writer = csv.DictWriter(combined_file, headers)
         dict_writer.writeheader()
         dict_writer.writerows(list_data)
+
+
+def get_intersection_keys(files, key_header):
+    keys = None
+    for filename in files:
+        with open(filename, 'r+') as fo:
+            headers = fo.readline().split(',')
+            key_header_index = headers.index(key_header)
+            file_keys = []
+            for line in fo:
+                line_data = line.split(',')
+                file_keys.append(line_data[key_header_index])
+            keys = keys & set(file_keys) if keys else set(file_keys)
+
+    return keys
+
+
