@@ -91,21 +91,19 @@ def calculate_assignments_attempted():
         a.writerows(lines)
 
 def calculate_questions_attempted():
-    csv_file = open('questions.csv')
-    headers_list = csv_file.next().strip().split(',')
-    headers_list.append('questions_attempted')
-    lines = [headers_list]
+    with open('questions.csv') as fa:
+        headers_list = fa.readline().strip().split(',')
+        headers_list.append('questions_attempted')
+        lines = [headers_list]
 
-    for line in csv_file:
-        splits = line.split(',')
-        splits = [f.strip() for f in splits]
-        zeroes = len([f for f in splits if f =='0'])
-        questions_submitted = 15 - zeroes
-        splits.append(str(questions_submitted))
-        lines.append(splits)
+        for line in fa:
+            splits = line.split(',')
+            splits = [f.strip() for f in splits]
+            zeroes = len([f for f in splits if f =='0'])
+            questions_submitted = 50 - zeroes
+            splits.append(str(questions_submitted))
+            lines.append(splits)
     
-    csv_file.close()
-
     with open('qqq.csv', 'w') as fp:
         a = csv.writer(fp, delimiter=',')
         a.writerows(lines)
@@ -120,17 +118,17 @@ def calculate_questions_grade():
     difficult for most people except exceptional people. 
     """
     import numpy as np
-    csv_file = open('qqq.csv')
-    headers_list = csv_file.next().strip().split(',')
-    headers_list.append('questions_grade')
-    data_lines = []
-    scores = []
+    with open('qqq.csv') as fo:
+        headers_list = fo.readline().strip().split(',')
+        headers_list.append('questions_grade')
+        data_lines = []
+        scores = []
     
-    for line in csv_file:
-        splits = [f.strip() for f in line.split(',')]
-        splits = [int(s) if get_type(s) is int else s for s in splits]
-        scores.append(splits[2])
-        data_lines.append(splits)
+        for line in fo:
+            splits = [f.strip() for f in line.split(',')]
+            # splits = [int(s) if get_type(s) is int else s for s in splits]
+            scores.append(int(splits[-1]))
+            data_lines.append(splits)
 
     std_dev = np.std(scores)
     grades = [score*1.0/std_dev for score in scores]
@@ -141,8 +139,6 @@ def calculate_questions_grade():
     for key, split_line in enumerate(data_lines):
         split_line.append(round(grades[key], 2))
         graded_lines.append(split_line)
-
-    csv_file.close()
 
     with open('qqq2.csv', 'w') as fp:
         a = csv.writer(fp, delimiter=',')
